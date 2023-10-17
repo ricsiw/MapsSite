@@ -44,7 +44,7 @@ function draw() {
   const fromColor = color(255, 0, 0, 0);
   const toColor = color(255, 0, 0, 255);
   time += deltaTime;
-  if (time > 500) {
+  if (time > 85) {
     time = 0;
     counter++;
   }
