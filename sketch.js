@@ -44,11 +44,11 @@ function draw() {
   const fromColor = color(255, 0, 0, 0);
   const toColor = color(255, 0, 0, 255);
   time += deltaTime;
-  if (time > 1) {
+  if (time > 50) {
     time = 0;
-    //counter++;
+    counter++;
   }
-  counter++;
+
   if (counter >= table.getRowCount()) {
     counter = showAmount;
     return;
