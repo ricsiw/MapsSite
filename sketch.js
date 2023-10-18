@@ -1,12 +1,12 @@
 const mappa = new Mappa('Leaflet');
 const latOrigin = 47.7878539778665;
 const lngOrigin = 18.231478521208;
-const showAmount = 5;
+const showAmount = 8;
 const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
 const tableCount = 10;
-let timeMultiplier = 4000;
+let timeMultiplier = 9000;
 let colors;
 let myMap;
 let canvas;
@@ -44,7 +44,7 @@ function preload() {
 
   tables = new Array();
   for (let i = 0; i < tableCount; i++) {
-    tables.push({data: loadTable('data/tr' + i + '.csv', 'csv', 'header'), counter: showAmount, enabled: true, fromColor:colors[i], toColor: toTransparent(colors[i])})
+    tables.push({data: loadTable('data/tr' + i + '.csv', 'csv', 'header'), counter: showAmount, enabled: true, toColor:colors[i], fromColor: toTransparent(colors[i])})
   }
 }
 
@@ -97,7 +97,7 @@ function draw() {
 
   if (showLegend) {
     text("Press num keys 0-9 to hide/show an animal. | Press 'a' to hide/show all animals.", 50, 20);
-    text("Press 'r' to restart. | Press 'p' to pause. | Press 'l' to hide/show legend.", 50, 40);
+    text("Press 'r' to restart. | Press the 'spacebar' to pause. | Press 'l' to hide/show legend.", 50, 40);
     text("Press the left and right arrows to control the playback speed.", 50, 60);
 
     strokeWeight(8);
@@ -127,7 +127,7 @@ function drawTable(table) {
   }
   if (table.enabled) { 
     for (let i = table.counter - showAmount; i <= table.counter; i++) {
-      let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - table.counter + showAmount) / showAmount, 1.5));
+      let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - showAmount)) / showAmount, 1.2));
       fill(c);
       var x = Number(table.data.getString(i, 1));
       var y = Number(table.data.getString(i, 2));
@@ -137,10 +137,16 @@ function drawTable(table) {
     }
   }
 }
+
 function keyPressed() {
   if (key == 'a') {
+    let enabledCount = 0;
     for (let i = 0; i < tableCount; i++) {
-      tables[i].enabled = !tables[i].enabled;
+      if (tables[i].enabled) 
+        enabledCount++;
+    }
+    for (let i = 0; i < tableCount; i++) {
+        tables[i].enabled = enabledCount < Math.round(tableCount / 2);
     }
   }
   else if (key == 'r') {
@@ -149,7 +155,7 @@ function keyPressed() {
       time = 0;
     }
   }
-  else if (key == 'p') {
+  else if (key == ' ') {
     paused = !paused;
   }
   else if (key == 'l') {
@@ -157,10 +163,10 @@ function keyPressed() {
   }
   else if (keyCode == LEFT_ARROW) {
     print("hohoho")
-    timeMultiplier = Math.max(0, timeMultiplier - 250)
+    timeMultiplier = Math.max(0, timeMultiplier - 500)
   }
   else if (keyCode == RIGHT_ARROW) {
-    timeMultiplier = timeMultiplier + 250
+    timeMultiplier = timeMultiplier + 500
   }
   for (let i = 0; i < tableCount; i++) {
     if (key == i.toString()) {
