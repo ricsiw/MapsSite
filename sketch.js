@@ -1,23 +1,69 @@
-let myMap;
-let canvas;
-let table;
 const mappa = new Mappa('Leaflet');
 const latOrigin = 47.7878539778665;
 const lngOrigin = 18.231478521208;
+const showAmount = 5;
+const radius = 6371000;
+const radToDeg = (180 / Math.PI);
+const degToRad = 1 / radToDeg;
+const tableCount = 10;
+let timeMultiplier = 4000;
+let colors;
+let myMap;
+let canvas;
+let minTick;
+let tables;
+let paused = false;
+let showLegend = true;
+var time = 0;
 
 // Lets put all our map options in a single object
 const options = {
-  lat: 47.787656,
-  lng: 18.230863,
-  zoom: 20,
+  lat: 47.788523,
+  lng: 18.230763,
+  zoom: 18,
   style: "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
 }
 
-function preload() {
-  table = loadTable('export.csv', 'csv');
+function toTransparent(c) {
+  return color(c.levels[0], c.levels[1], c.levels[2], 0)
 }
 
-function setup(){
+function preload() {
+  colors = [
+    color(128, 0, 0),
+    color(70, 240, 240),
+    color(128, 128, 0),
+    color(0, 128, 128),
+    color(0, 0, 128),
+    color(230, 25, 75),
+    color(245, 130, 48),
+    color(230, 200, 25),
+    color(0, 0, 0),
+    color(240, 50, 230),
+  ];
+
+  tables = new Array();
+  for (let i = 0; i < tableCount; i++) {
+    tables.push({data: loadTable('data/tr' + i + '.csv', 'csv', 'header'), counter: showAmount, enabled: true, fromColor:colors[i], toColor: toTransparent(colors[i])})
+  }
+}
+
+function getTick(table) {
+  return (new Date(table.data.getString(table.counter, 0)).getTime()) - minTick;
+}
+
+function setup() {
+  var dateString = "17-Sep-2023 18:13:56";
+  var dateMilliseconds = Date.parse(dateString);
+  var dateObject = new Date(dateMilliseconds);
+  console.log(dateObject); // Sun Sep 17 2023 18:13:56 GMT+0200 (Central European Summer Time)
+
+  minTick = new Date(8640000000000000);
+  for (let i = 0; i < tableCount; i++) {
+    let tick = new Date(tables[i].data.getString(tables[i].counter, 0)).getTime();
+    if (tick < minTick) minTick = tick;
+  }
+
   canvas = createCanvas(840,840);
   myMap = mappa.tileMap(options); 
   myMap.overlay(canvas)
@@ -26,14 +72,6 @@ function setup(){
   fill(200, 100, 100);
 }
 
-const showAmount = 18;
-var time = 0;
-var counter = showAmount;
-
-const radius = 6371000;
-const radToDeg = (180 / Math.PI);
-const degToRad = 1 / radToDeg;
-
 function convert(x, y) {
   let lat = latOrigin + (y / radius) * radToDeg;
   let lng = lngOrigin + (x / (Math.cos(degToRad * latOrigin) * radius)) * radToDeg;
@@ -41,47 +79,93 @@ function convert(x, y) {
 }
 
 function draw() {
-  const fromColor = color(255, 0, 0, 0);
-  const toColor = color(255, 0, 0, 255);
-  time += deltaTime;
-  if (time > 85) {
-    time = 0;
-    counter++;
-  }
+  let fromColor = color(255, 0, 0, 0);
+  let toColor = color(255, 0, 0, 255);
+  if (!paused) time += deltaTime * timeMultiplier;
 
-  if (counter >= table.getRowCount()) {
-    counter = showAmount;
-    return;
+  for (let i = 0; i < tableCount; i++) {
+    if (getTick(tables[i]) <= time && tables[i].data.getRowCount() > tables[i].counter) {
+      tables[i].counter++;
+    }
   }
 
   clear(); 
-  noStroke();
+  textAlign(LEFT, CENTER);
+  textSize(16);
+  fill(color(0,0,0));
+  text(new Date(Math.floor(time) + minTick).toString(), 10, canvas.height - 10);
 
-  for (let i = counter - showAmount; i <= counter; i++) {
-    let c = lerpColor(fromColor, toColor, (i - counter + showAmount) / showAmount);
-    fill(c);
-    var x = Number(table.getString(i, 0));
-    var y = Number(table.getString(i, 1));
-    let latLng = convert(x, y);
-    let p = myMap.latLngToPixel(latLng[0], latLng[1]);
-    ellipse(p.x, p.y, 8, 8);
+  if (showLegend) {
+    text("Press num keys 0-9 to hide/show an animal. | Press 'a' to hide/show all animals.", 50, 20);
+    text("Press 'r' to restart. | Press 'p' to pause. | Press 'l' to hide/show legend.", 50, 40);
+    text("Press the left and right arrows to control the playback speed.", 50, 60);
+
+    strokeWeight(8);
+    for (let i = 0; i < tableCount; i++) {
+      if (!tables[i].enabled) continue;
+      noStroke();
+      text("tr" + i, 10, 150 + i * 20);
+      stroke(colors[i]);
+      line(40, 150 + i * 20, 50, 150 + i * 20);
+    }
+
+    noStroke();
+    textAlign(RIGHT, CENTER);
+    fill("red")
+    text(paused ? "paused" : "playback speed: " + timeMultiplier + "x", 830, 20);
   }
 
-  /*for (let i = 0; i < table.getRowCount(); i++) {
-    var x = Number(table.getString(i, 0));
-    var y = Number(table.getString(i, 1));
-
-    fill(gre);
-    noStroke();
-    let latLng = convert(x, y);
-    let p = myMap.latLngToPixel(latLng[0], latLng[1]);
-    ellipse(p.x, p.y, 5, 5);
-  }*/
+  noStroke();
+  for (let i = 0; i < tableCount; i++) {
+    drawTable(tables[i]);
+  }
 }
 
+function drawTable(table) {
+  if (table.counter >= table.data.getRowCount()) {
+    table.counter = table.data.getRowCount() - 1;
+  }
+  if (table.enabled) { 
+    for (let i = table.counter - showAmount; i <= table.counter; i++) {
+      let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - table.counter + showAmount) / showAmount, 1.5));
+      fill(c);
+      var x = Number(table.data.getString(i, 1));
+      var y = Number(table.data.getString(i, 2));
+      let latLng = convert(x, y);
+      let p = myMap.latLngToPixel(latLng[0], latLng[1]);
+      ellipse(p.x, p.y, 8, 8);
+    }
+  }
+}
 function keyPressed() {
-  // this will download the first 5 seconds of the animation!
-  if (key === 's') {
-    saveGif('mySketch', 3);
+  if (key == 'a') {
+    for (let i = 0; i < tableCount; i++) {
+      tables[i].enabled = !tables[i].enabled;
+    }
+  }
+  else if (key == 'r') {
+    for (let i = 0; i < tableCount; i++) {
+      tables[i].counter = showAmount;
+      time = 0;
+    }
+  }
+  else if (key == 'p') {
+    paused = !paused;
+  }
+  else if (key == 'l') {
+    showLegend = !showLegend;
+  }
+  else if (keyCode == LEFT_ARROW) {
+    print("hohoho")
+    timeMultiplier = Math.max(0, timeMultiplier - 250)
+  }
+  else if (keyCode == RIGHT_ARROW) {
+    timeMultiplier = timeMultiplier + 250
+  }
+  for (let i = 0; i < tableCount; i++) {
+    if (key == i.toString()) {
+      print(i)
+      tables[i].enabled = !tables[i].enabled;
+    }
   }
 }
