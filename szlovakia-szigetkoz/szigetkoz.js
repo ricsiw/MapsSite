@@ -1,12 +1,13 @@
 const mappa = new Mappa('MapboxGL', 'pk.eyJ1Ijoicmljc2l3IiwiYSI6ImNsbnZ5bjM1czAxcmEybGxlcm54N2huMDAifQ.qaRqm5vzbvBtEfdgQabbYw');
 const latOrigin = 47.77189508;
 const lngOrigin = 17.86181482;
-const showAmount = 50;
+const showAmount = 20;
 const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
 const tableCount = 3;
-let timeMultiplier = 9000;
+let timeMultiplier = 350;
+let timeMultiplierStep = 50;
 let colors;
 let myMap;
 let canvas;
@@ -62,9 +63,6 @@ function setup() {
   canvas = createCanvas(document.documentElement.scrollWidth - 20, document.documentElement.scrollHeight - 20);
   myMap = mappa.tileMap(options); 
   myMap.overlay(canvas)
-
-  // Add a color to our ellipse
-  fill(200, 100, 100);
 }
 
 /*function windowResized() {
@@ -85,9 +83,12 @@ function draw() {
   let toColor = color(255, 0, 0, 255);
   if (!paused) time += deltaTime * timeMultiplier;
 
+  //print('tick ' + getTick(tables[2]) + ", time " + time)
+  
   for (let i = 0; i < tableCount; i++) {
-    if (getTick(tables[i]) <= time && tables[i].data.getRowCount() > tables[i].counter) {
+    while (getTick(tables[i]) <= time && tables[i].data.getRowCount() > tables[i].counter) {
       tables[i].counter++;
+      //if (i == 2){ print("TICK TACK");}
     }
   }
 
@@ -165,10 +166,10 @@ function keyPressed() {
   }
   else if (keyCode == LEFT_ARROW) {
     print("hohoho")
-    timeMultiplier = Math.max(0, timeMultiplier - 500)
+    timeMultiplier = Math.max(0, timeMultiplier - timeMultiplierStep)
   }
   else if (keyCode == RIGHT_ARROW) {
-    timeMultiplier = timeMultiplier + 500
+    timeMultiplier = timeMultiplier + timeMultiplierStep
   }
   for (let i = 0; i < tableCount; i++) {
     if (key == i.toString()) {
