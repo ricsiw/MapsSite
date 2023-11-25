@@ -6,8 +6,8 @@ const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
 const tableCount = 3;
-let timeMultiplier = 900;
-let timeMultiplierStep = 50;
+let timeMultiplier = 1100;
+let timeMultiplierStep = 100;
 let colors;
 let myMap;
 let canvas;
@@ -15,6 +15,7 @@ let minTick;
 let tables;
 let paused = false;
 let showLegend = true;
+let keepBackground = false;
 var time = 0;
 
 const options = {
@@ -44,9 +45,9 @@ function preload() {
   ];
 
   tables = new Array();
-  tables.push({data: loadTable('data/exp_akima.csv', 'csv'), counter: 40, enabled: true, name: "akima", trace: 40, toColor:colors[0], fromColor: toTransparent(colors[0])})
-  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), counter: 40, enabled: false, name: "akima mean", trace: 40, toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/exp_raw.csv', 'csv'), counter: 8, enabled: false, name: "raw", trace: 8, toColor:colors[2], fromColor: toTransparent(colors[2])})
+  tables.push({data: loadTable('data/exp_akima.csv', 'csv'), counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
+  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
+  tables.push({data: loadTable('data/exp_raw.csv', 'csv'), counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.13, toColor:colors[2], fromColor: toTransparent(colors[2])})
 }
 
 function getTick(table) {
@@ -98,7 +99,7 @@ function draw() {
   if (showLegend) {
     text("Press num keys 0-" + (tableCount - 1) + " to hide/show an animal. | Press 'a' to hide/show all animals.", 50, 20);
     text("Press 'r' to restart. | Press the 'spacebar' to pause. | Press 'l' to hide/show legend.", 50, 40);
-    text("Press the left and right arrows to control the playback speed.", 50, 60);
+    text("Press the left and right arrows to control the playback speed. | Press 'm' to hide/show all data points so far.", 50, 60);
 
     strokeWeight(8);
     for (let i = 0; i < tableCount; i++) {
@@ -127,15 +128,17 @@ function drawTable(table) {
   }
   if (table.enabled) {
 
-   /* let c2 = lerpColor(table.fromColor, table.toColor, 0.05);
-    fill(c2);
-    for (let i = 0; i < table.counter; i++) {
-      var x = Number(table.data.getString(i, 1));
-      var y = Number(table.data.getString(i, 2));
-      let latLng = convert(x, y);
-      let p = myMap.latLngToPixel(latLng[0], latLng[1]);
-      ellipse(p.x, p.y, 8, 8);
-    }*/
+    if (keepBackground) {
+      let c2 = lerpColor(table.fromColor, table.toColor, table.bgVisibility);
+      fill(c2);
+      for (let i = 0; i < table.counter; i++) {
+        var x = Number(table.data.getString(i, 1));
+        var y = Number(table.data.getString(i, 2));
+        let latLng = convert(x, y);
+        let p = myMap.latLngToPixel(latLng[0], latLng[1]);
+        ellipse(p.x, p.y, 8, 8);
+      }
+    }
 
     for (let i = table.counter - table.trace; i <= table.counter; i++) {
       var x = Number(table.data.getString(i, 1));
@@ -180,6 +183,9 @@ function keyPressed() {
   }
   else if (key == 'l') {
     showLegend = !showLegend;
+  }
+  else if (key == 'm') {
+    keepBackground = !keepBackground;
   }
   else if (keyCode == LEFT_ARROW) {
     print("hohoho")
