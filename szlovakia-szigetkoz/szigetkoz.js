@@ -1,11 +1,11 @@
-const mappa = new Mappa('Leaflet');
-const latOrigin = 47.7878539778665;
-const lngOrigin = 18.231478521208;
-const showAmount = 8;
+const mappa = new Mappa('MapboxGL', 'pk.eyJ1Ijoicmljc2l3IiwiYSI6ImNsbnZ5bjM1czAxcmEybGxlcm54N2huMDAifQ.qaRqm5vzbvBtEfdgQabbYw');
+const latOrigin = 47.77189508;
+const lngOrigin = 17.86181482;
+const showAmount = 50;
 const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
-const tableCount = 10;
+const tableCount = 3;
 let timeMultiplier = 9000;
 let colors;
 let myMap;
@@ -16,13 +16,13 @@ let paused = false;
 let showLegend = true;
 var time = 0;
 
-// Lets put all our map options in a single object
 const options = {
-  lat: 47.788523,
-  lng: 18.230763,
-  zoom: 18,
-  style: "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-}
+  lat: 47.771456,
+  lng: 17.861905,
+  zoom: 17,
+  style: 'mapbox://styles/ricsiw/clp6yh55f00is01pc8bywhgkm',
+  pitch: 0,
+};
 
 function toTransparent(c) {
   return color(c.levels[0], c.levels[1], c.levels[2], 0)
@@ -30,22 +30,22 @@ function toTransparent(c) {
 
 function preload() {
   colors = [
+    color(70, 240, 240),//
+    color(230, 25, 75),//
+    color(230, 200, 25),//
     color(128, 0, 0),
-    color(70, 240, 240),
     color(128, 128, 0),
     color(0, 128, 128),
     color(0, 0, 128),
-    color(230, 25, 75),
     color(245, 130, 48),
-    color(230, 200, 25),
     color(0, 0, 0),
     color(240, 50, 230),
   ];
 
   tables = new Array();
-  for (let i = 0; i < tableCount; i++) {
-    tables.push({data: loadTable('data/tr' + i + '.csv', 'csv', 'header'), counter: showAmount, enabled: true, toColor:colors[i], fromColor: toTransparent(colors[i])})
-  }
+  tables.push({data: loadTable('data/exp_akima.csv', 'csv'), counter: showAmount, enabled: true, name: "akima", toColor:colors[0], fromColor: toTransparent(colors[0])})
+  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), counter: showAmount, enabled: false, name: "akima mean", toColor:colors[1], fromColor: toTransparent(colors[1])})
+  tables.push({data: loadTable('data/exp_raw.csv', 'csv'), counter: showAmount, enabled: false, name: "raw", toColor:colors[2], fromColor: toTransparent(colors[2])})
 }
 
 function getTick(table) {
@@ -53,24 +53,26 @@ function getTick(table) {
 }
 
 function setup() {
-  var dateString = "17-Sep-2023 18:13:56";
-  var dateMilliseconds = Date.parse(dateString);
-  var dateObject = new Date(dateMilliseconds);
-  console.log(dateObject); // Sun Sep 17 2023 18:13:56 GMT+0200 (Central European Summer Time)
-
   minTick = new Date(8640000000000000);
   for (let i = 0; i < tableCount; i++) {
     let tick = new Date(tables[i].data.getString(tables[i].counter, 0)).getTime();
     if (tick < minTick) minTick = tick;
   }
 
-  canvas = createCanvas(840,840);
+  canvas = createCanvas(document.documentElement.scrollWidth - 20, document.documentElement.scrollHeight - 20);
   myMap = mappa.tileMap(options); 
   myMap.overlay(canvas)
 
   // Add a color to our ellipse
   fill(200, 100, 100);
 }
+
+/*function windowResized() {
+  print("helo")
+  let pageWidth  = document.documentElement.scrollWidth - 20;
+  let pageHeight = document.documentElement.scrollHeight - 20;
+  resizeCanvas(pageWidth, pageHeight);
+}*/
 
 function convert(x, y) {
   let lat = latOrigin + (y / radius) * radToDeg;
@@ -92,11 +94,11 @@ function draw() {
   clear(); 
   textAlign(LEFT, CENTER);
   textSize(16);
-  fill(color(0,0,0));
-  text(new Date(Math.floor(time) + minTick).toString(), 10, canvas.height - 10);
+  fill(color(255,255,255));
+  text(new Date(Math.floor(time) + minTick).toString(), 10, canvas.height - 50);
 
   if (showLegend) {
-    text("Press num keys 0-9 to hide/show an animal. | Press 'a' to hide/show all animals.", 50, 20);
+    text("Press num keys 0-" + (tableCount - 1) + " to hide/show an animal. | Press 'a' to hide/show all animals.", 50, 20);
     text("Press 'r' to restart. | Press the 'spacebar' to pause. | Press 'l' to hide/show legend.", 50, 40);
     text("Press the left and right arrows to control the playback speed.", 50, 60);
 
@@ -104,11 +106,11 @@ function draw() {
     for (let i = 0; i < tableCount; i++) {
       if (!tables[i].enabled) continue;
       noStroke();
-      text("tr" + i, 10, 150 + i * 20);
+      text(tables[i].name, 10, 150 + i * 20);
       stroke(colors[i]);
-      line(40, 150 + i * 20, 50, 150 + i * 20);
+      line(110, 150 + i * 20, 125, 150 + i * 20);
     }
-
+    
     noStroke();
     textAlign(RIGHT, CENTER);
     fill("red")
