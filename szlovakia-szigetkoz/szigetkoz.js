@@ -6,7 +6,7 @@ const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
 const tableCount = 3;
-let timeMultiplier = 350;
+let timeMultiplier = 900;
 let timeMultiplierStep = 50;
 let colors;
 let myMap;
@@ -44,9 +44,9 @@ function preload() {
   ];
 
   tables = new Array();
-  tables.push({data: loadTable('data/exp_akima.csv', 'csv'), counter: showAmount, enabled: true, name: "akima", toColor:colors[0], fromColor: toTransparent(colors[0])})
-  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), counter: showAmount, enabled: false, name: "akima mean", toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/exp_raw.csv', 'csv'), counter: showAmount, enabled: false, name: "raw", toColor:colors[2], fromColor: toTransparent(colors[2])})
+  tables.push({data: loadTable('data/exp_akima.csv', 'csv'), counter: 40, enabled: true, name: "akima", trace: 40, toColor:colors[0], fromColor: toTransparent(colors[0])})
+  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), counter: 40, enabled: false, name: "akima mean", trace: 40, toColor:colors[1], fromColor: toTransparent(colors[1])})
+  tables.push({data: loadTable('data/exp_raw.csv', 'csv'), counter: 8, enabled: false, name: "raw", trace: 8, toColor:colors[2], fromColor: toTransparent(colors[2])})
 }
 
 function getTick(table) {
@@ -82,13 +82,10 @@ function draw() {
   let fromColor = color(255, 0, 0, 0);
   let toColor = color(255, 0, 0, 255);
   if (!paused) time += deltaTime * timeMultiplier;
-
-  //print('tick ' + getTick(tables[2]) + ", time " + time)
   
   for (let i = 0; i < tableCount; i++) {
-    while (getTick(tables[i]) <= time && tables[i].data.getRowCount() > tables[i].counter) {
+    while (tables[i].data.getRowCount() > tables[i].counter && getTick(tables[i]) <= time) {
       tables[i].counter++;
-      //if (i == 2){ print("TICK TACK");}
     }
   }
 
@@ -128,15 +125,35 @@ function drawTable(table) {
   if (table.counter >= table.data.getRowCount()) {
     table.counter = table.data.getRowCount() - 1;
   }
-  if (table.enabled) { 
-    for (let i = table.counter - showAmount; i <= table.counter; i++) {
-      let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - showAmount)) / showAmount, 1.2));
-      fill(c);
+  if (table.enabled) {
+
+   /* let c2 = lerpColor(table.fromColor, table.toColor, 0.05);
+    fill(c2);
+    for (let i = 0; i < table.counter; i++) {
       var x = Number(table.data.getString(i, 1));
       var y = Number(table.data.getString(i, 2));
       let latLng = convert(x, y);
       let p = myMap.latLngToPixel(latLng[0], latLng[1]);
       ellipse(p.x, p.y, 8, 8);
+    }*/
+
+    for (let i = table.counter - table.trace; i <= table.counter; i++) {
+      var x = Number(table.data.getString(i, 1));
+      var y = Number(table.data.getString(i, 2));
+      let latLng = convert(x, y);
+      let p = myMap.latLngToPixel(latLng[0], latLng[1]);
+
+      let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - table.trace)) / table.trace, 3.0));
+      if (i == table.counter) {
+        fill(color(0, 0, 0))
+        ellipse(p.x, p.y, 10, 10);
+        fill(c);
+        ellipse(p.x, p.y, 8, 8);
+      }
+      else {
+        fill(c);
+        ellipse(p.x, p.y, 8, 8);
+      }
     }
   }
 }
@@ -154,7 +171,7 @@ function keyPressed() {
   }
   else if (key == 'r') {
     for (let i = 0; i < tableCount; i++) {
-      tables[i].counter = showAmount;
+      tables[i].counter = tables[i].trace;
       time = 0;
     }
   }
