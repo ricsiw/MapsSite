@@ -5,7 +5,7 @@ const showAmount = 20;
 const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
-const tableCount = 3;
+const tableCount = 2;
 let timeMultiplier = 1100;
 let timeMultiplierStep = 100;
 let colors;
@@ -33,8 +33,8 @@ function toTransparent(c) {
 function preload() {
   colors = [
     color(70, 240, 240),//
-    color(230, 25, 75),//
     color(230, 200, 25),//
+    color(230, 25, 75),//
     color(128, 0, 0),
     color(128, 128, 0),
     color(0, 128, 128),
@@ -54,8 +54,8 @@ function preload() {
   let pg1 = getImgArray(w, h);
   let pg2 = getImgArray(w, h);
   tables.push({data: loadTable('data/export_akima.csv', 'csv'), img: pg0, counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
-  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), img: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/export_raw.csv', 'csv'), img: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.1601, toColor:colors[2], fromColor: toTransparent(colors[2])})
+  //tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), img: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
+  tables.push({data: loadTable('data/export_raw.csv', 'csv'), img: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.1601, toColor:colors[1], fromColor: toTransparent(colors[1])})
 }
 
 function getImgArray(w, h) {
