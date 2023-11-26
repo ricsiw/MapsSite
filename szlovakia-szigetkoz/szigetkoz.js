@@ -1,6 +1,6 @@
 const mappa = new Mappa('MapboxGL', 'pk.eyJ1Ijoicmljc2l3IiwiYSI6ImNsbnZ5bjM1czAxcmEybGxlcm54N2huMDAifQ.qaRqm5vzbvBtEfdgQabbYw');
-const latOrigin = 47.77189508;
-const lngOrigin = 17.86181482;
+const latOrigin = 47.77156184;
+const lngOrigin = 17.86227096;
 const showAmount = 20;
 const radius = 6371000;
 const radToDeg = (180 / Math.PI);
