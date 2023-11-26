@@ -45,9 +45,17 @@ function preload() {
   ];
 
   tables = new Array();
-  tables.push({data: loadTable('data/exp_akima.csv', 'csv'), counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
-  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/exp_raw.csv', 'csv'), counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.13, toColor:colors[2], fromColor: toTransparent(colors[2])})
+  let w = document.documentElement.scrollWidth - 20;
+  let h =  document.documentElement.scrollHeight - 20;
+//  pg0 = {g: createGraphics(w, h, 'WEBGL'), a: Array(100).fill(0)};
+//  pg0 = {g: createGraphics(w, h, 'WEBGL'), a: Array(100).fill(0)};
+//  pg0 = {g: createGraphics(w, h, 'WEBGL'), a: Array(100).fill(0)};
+  pg0 = createGraphics(w, h, 'WEBGL');
+  pg1 = createGraphics(w, h, 'WEBGL');
+  pg2 = createGraphics(w, h, 'WEBGL');
+  tables.push({data: loadTable('data/export_akima.csv', 'csv'), pg: pg0, counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
+  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), pg: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
+  tables.push({data: loadTable('data/export_raw.csv', 'csv'), pg: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.13, toColor:colors[2], fromColor: toTransparent(colors[2])})
 }
 
 function getTick(table) {
@@ -147,6 +155,9 @@ function drawTable(table) {
       let p = myMap.latLngToPixel(latLng[0], latLng[1]);
 
       let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - table.trace)) / table.trace, 3.0));
+
+      //spreadHeatmap(table, lerpColor(table.fromColor, table.toColor, 1), p.x, p.y);
+
       if (i == table.counter) {
         fill(color(0, 0, 0))
         ellipse(p.x, p.y, 10, 10);
@@ -159,6 +170,26 @@ function drawTable(table) {
       }
     }
   }
+}
+
+function spreadHeatmap(table, c, x, y) {
+  //table.pg.loadPixels();
+  table.pg.fill(c)
+  table.pg.noStroke()
+  /*table.pg.set(x, y, 0)
+  table.pg.set(x + 1, y, 0)
+  table.pg.set(x - 1, y, 0)
+  table.pg.set(x, y + 1, 0)
+  table.pg.set(x, y - 1, 0)*/
+  //table.pg.get(x,y)
+  table.pg.rect(x, y, 1, 1);
+  table.pg.updatePixels()
+  //table.pg.updatePixels();
+  image(table.pg, 0, 0)
+}
+
+function pixelAt() {
+
 }
 
 function keyPressed() {
