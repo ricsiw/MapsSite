@@ -47,15 +47,29 @@ function preload() {
   tables = new Array();
   let w = document.documentElement.scrollWidth - 20;
   let h =  document.documentElement.scrollHeight - 20;
-//  pg0 = {g: createGraphics(w, h, 'WEBGL'), a: Array(100).fill(0)};
-//  pg0 = {g: createGraphics(w, h, 'WEBGL'), a: Array(100).fill(0)};
-//  pg0 = {g: createGraphics(w, h, 'WEBGL'), a: Array(100).fill(0)};
-  pg0 = createGraphics(w, h, 'WEBGL');
-  pg1 = createGraphics(w, h, 'WEBGL');
-  pg2 = createGraphics(w, h, 'WEBGL');
+  let pg0 = createGraphics(w, h, 'WEBGL');
+  let pg1 = createGraphics(w, h, 'WEBGL');
+  let pg2 = createGraphics(w, h, 'WEBGL');
+  /*let pg0 = getImgArray(w, h);
+  let pg1 = getImgArray(w, h);
+  let pg2 = getImgArray(w, h);*/
   tables.push({data: loadTable('data/export_akima.csv', 'csv'), pg: pg0, counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
   tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), pg: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/export_raw.csv', 'csv'), pg: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.13, toColor:colors[2], fromColor: toTransparent(colors[2])})
+  tables.push({data: loadTable('data/export_raw.csv', 'csv'), pg: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.1601, toColor:colors[2], fromColor: toTransparent(colors[2])})
+}
+
+function getImgArray(w, h) {
+  let size = Math.floor((w * h) / 9);
+  size = size + 9 - (size % 9)
+  return {g: createGraphics(w, h, 'WEBGL'), a: Array(size).fill(0)};
+}
+
+function clearImgArray(a) {
+  a.fill(0);
+}
+
+function pixelAt(a, x, y) {
+  return a[x];
 }
 
 function getTick(table) {
@@ -186,10 +200,6 @@ function spreadHeatmap(table, c, x, y) {
   table.pg.updatePixels()
   //table.pg.updatePixels();
   image(table.pg, 0, 0)
-}
-
-function pixelAt() {
-
 }
 
 function keyPressed() {
