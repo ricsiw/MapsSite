@@ -47,29 +47,34 @@ function preload() {
   tables = new Array();
   let w = document.documentElement.scrollWidth - 20;
   let h =  document.documentElement.scrollHeight - 20;
-  let pg0 = createGraphics(w, h, 'WEBGL');
+  /*let pg0 = createGraphics(w, h, 'WEBGL');
   let pg1 = createGraphics(w, h, 'WEBGL');
-  let pg2 = createGraphics(w, h, 'WEBGL');
-  /*let pg0 = getImgArray(w, h);
+  let pg2 = createGraphics(w, h, 'WEBGL');*/
+  let pg0 = getImgArray(w, h);
   let pg1 = getImgArray(w, h);
-  let pg2 = getImgArray(w, h);*/
-  tables.push({data: loadTable('data/export_akima.csv', 'csv'), pg: pg0, counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
-  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), pg: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/export_raw.csv', 'csv'), pg: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.1601, toColor:colors[2], fromColor: toTransparent(colors[2])})
+  let pg2 = getImgArray(w, h);
+  tables.push({data: loadTable('data/export_akima.csv', 'csv'), img: pg0, counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.07, toColor:colors[0], fromColor: toTransparent(colors[0])})
+  tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), img: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
+  tables.push({data: loadTable('data/export_raw.csv', 'csv'), img: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.1601, toColor:colors[2], fromColor: toTransparent(colors[2])})
 }
 
 function getImgArray(w, h) {
-  let size = Math.floor((w * h) / 9);
-  size = size + 9 - (size % 9)
-  return {g: createGraphics(w, h, 'WEBGL'), a: Array(size).fill(0)};
+  let size = Math.floor(w / 3) * Math.floor(h / 3);
+  let img = {g: createGraphics(w, h, 'WEBGL'), a: Array(size).fill(0), w: w, h: h, d: 3};
+  img.g.noStroke();
+  return img;
 }
 
 function clearImgArray(a) {
   a.fill(0);
 }
 
-function pixelAt(a, x, y) {
-  return a[x];
+function pixelAt(img, x, y) {
+  return img.a[Math.floor(y / 3) * img.w + Math.floor(x / 3)];
+}
+
+function setPixel(img, x, y, v) {
+  img.a[Math.floor(y / 3) * img.w + Math.floor(x / 3)] = v;
 }
 
 function getTick(table) {
@@ -154,8 +159,8 @@ function drawTable(table) {
       let c2 = lerpColor(table.fromColor, table.toColor, table.bgVisibility);
       fill(c2);
       for (let i = 0; i < table.counter; i++) {
-        var x = Number(table.data.getString(i, 1));
-        var y = Number(table.data.getString(i, 2));
+        let x = Number(table.data.getString(i, 1));
+        let y = Number(table.data.getString(i, 2));
         let latLng = convert(x, y);
         let p = myMap.latLngToPixel(latLng[0], latLng[1]);
         ellipse(p.x, p.y, 8, 8);
@@ -163,16 +168,15 @@ function drawTable(table) {
     }
 
     for (let i = table.counter - table.trace; i <= table.counter; i++) {
-      var x = Number(table.data.getString(i, 1));
-      var y = Number(table.data.getString(i, 2));
+      let x = Number(table.data.getString(i, 1));
+      let y = Number(table.data.getString(i, 2));
       let latLng = convert(x, y);
       let p = myMap.latLngToPixel(latLng[0], latLng[1]);
 
       let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - table.trace)) / table.trace, 3.0));
 
-      //spreadHeatmap(table, lerpColor(table.fromColor, table.toColor, 1), p.x, p.y);
-
       if (i == table.counter) {
+        //spreadHeatmap(table, lerpColor(table.fromColor, table.toColor, 1), p.x, p.y);
         fill(color(0, 0, 0))
         ellipse(p.x, p.y, 10, 10);
         fill(c);
@@ -187,19 +191,22 @@ function drawTable(table) {
 }
 
 function spreadHeatmap(table, c, x, y) {
-  //table.pg.loadPixels();
-  table.pg.fill(c)
-  table.pg.noStroke()
-  /*table.pg.set(x, y, 0)
-  table.pg.set(x + 1, y, 0)
-  table.pg.set(x - 1, y, 0)
-  table.pg.set(x, y + 1, 0)
-  table.pg.set(x, y - 1, 0)*/
-  //table.pg.get(x,y)
-  table.pg.rect(x, y, 1, 1);
-  table.pg.updatePixels()
-  //table.pg.updatePixels();
-  image(table.pg, 0, 0)
+  /*let img = table.img;
+  c.setAlpha(1);
+  img.g.fill(c)
+  for (let yi = -5; yi < 5; yi++) {
+    for (let xi = -5; xi < 5; xi++) {
+      let v = pixelAt(img, x, y);
+      img.g.rect(x + xi * img.d, y + yi * img.d, img.d, img.d);
+    }
+  }*/
+  pg = createGraphics(40, 40);
+  pg.noStroke();
+  pg.fill(c);
+  pg.ellipse(17, 17, 6, 6);
+  pg.filter(BLUR, 5);
+  table.img.g.image(pg, x - 25, y - 25);
+  image(table.img.g, 0, 0);
 }
 
 function keyPressed() {
