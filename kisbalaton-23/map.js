@@ -6,7 +6,7 @@ const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
 const tableCount = 6;
-let timeMultiplier = 1000;
+let timeMultiplier = 4000;
 let timeMultiplierStep = 250;
 let colors;
 let myMap;
