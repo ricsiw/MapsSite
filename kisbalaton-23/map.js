@@ -5,9 +5,9 @@ const showAmount = 20;
 const radius = 6371000;
 const radToDeg = (180 / Math.PI);
 const degToRad = 1 / radToDeg;
-const tableCount = 2;
-let timeMultiplier = 1100;
-let timeMultiplierStep = 100;
+const tableCount = 6;
+let timeMultiplier = 1000;
+let timeMultiplierStep = 250;
 let colors;
 let myMap;
 let canvas;
@@ -19,8 +19,8 @@ let keepBackground = false;
 var time = 0;
 
 const options = {
-  lat: 47.771456,
-  lng: 17.861905,
+  lat: 46.7068892661239,
+  lng: 17.1815387622227,
   zoom: 17,
   style: 'mapbox://styles/ricsiw/clp6yh55f00is01pc8bywhgkm',
   pitch: 0,
@@ -33,12 +33,12 @@ function toTransparent(c) {
 function preload() {
   colors = [
     color(70, 240, 240),//
-    color(230, 200, 25),//
+    color(245, 156, 22),//
     color(230, 25, 75),//
-    color(128, 0, 0),
-    color(128, 128, 0),
-    color(0, 128, 128),
-    color(0, 0, 128),
+    color(43, 217, 37),
+    color(199, 199, 4),
+    color(123, 16, 230),
+    color(33, 81, 255),
     color(245, 130, 48),
     color(0, 0, 0),
     color(240, 50, 230),
@@ -47,15 +47,13 @@ function preload() {
   tables = new Array();
   let w = document.documentElement.scrollWidth - 20;
   let h =  document.documentElement.scrollHeight - 20;
-  /*let pg0 = createGraphics(w, h, 'WEBGL');
-  let pg1 = createGraphics(w, h, 'WEBGL');
-  let pg2 = createGraphics(w, h, 'WEBGL');*/
-  let pg0 = getImgArray(w, h);
-  let pg1 = getImgArray(w, h);
-  let pg2 = getImgArray(w, h);
-  tables.push({data: loadTable('data/export_akima.csv', 'csv'), img: pg0, counter: 40, enabled: true, name: "akima", trace: 40, bgVisibility: 0.01, toColor:colors[0], fromColor: toTransparent(colors[0])})
-  //tables.push({data: loadTable('data/exp_akima_movmean31.csv', 'csv'), img: pg1, counter: 40, enabled: false, name: "akima mean", trace: 40, bgVisibility: 0.07, toColor:colors[1], fromColor: toTransparent(colors[1])})
-  tables.push({data: loadTable('data/export_raw.csv', 'csv'), img: pg2, counter: 8, enabled: false, name: "raw", trace: 8, bgVisibility: 0.1601, toColor:colors[1], fromColor: toTransparent(colors[1])})
+
+  let fileNameTags = ['3', '4','6','7','8','9'];
+
+  for (let i = 0; i < tableCount; i++) {
+    let pg = getImgArray(w, h);
+    tables.push({data: loadTable('data/exportD' + fileNameTags[i] + '_akima.csv', 'csv', 'header'), img: pg, counter: 40, enabled: true, name: "akima tr" + fileNameTags[i], trace: 40, bgVisibility: 0.01, toColor:colors[i], fromColor: toTransparent(colors[i])})
+  }
 }
 
 function getImgArray(w, h) {
@@ -104,6 +102,10 @@ function convert(x, y) {
   let lat = latOrigin + (y / radius) * radToDeg;
   let lng = lngOrigin + (x / (Math.cos(degToRad * latOrigin) * radius)) * radToDeg;
   return [lat, lng];
+}
+
+function latLngFromString(lat, lng) {
+  return [Number(lat), Number(lng)];
 }
 
 function draw() {
@@ -160,21 +162,16 @@ function drawTable(table) {
       c2.setAlpha(2);
       fill(c2);
       for (let i = 0; i < table.counter; i++) {
-        let x = Number(table.data.getString(i, 1));
-        let y = Number(table.data.getString(i, 2));
-        let latLng = convert(x, y);
+        let latLng = latLngFromString(table.data.getString(i, 3), table.data.getString(i, 4));
         let p = myMap.latLngToPixel(latLng[0], latLng[1]);
         ellipse(p.x, p.y, 5, 5);
         ellipse(p.x, p.y, 8, 8);
-        //ellipse(p.x, p.y, 13, 13);
         ellipse(p.x, p.y, 20, 20);
       }
     }
 
     for (let i = table.counter - table.trace; i <= table.counter; i++) {
-      let x = Number(table.data.getString(i, 1));
-      let y = Number(table.data.getString(i, 2));
-      let latLng = convert(x, y);
+      let latLng = latLngFromString(table.data.getString(i, 3), table.data.getString(i, 4));
       let p = myMap.latLngToPixel(latLng[0], latLng[1]);
 
       let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - table.trace)) / table.trace, 3.0));
