@@ -52,7 +52,7 @@ function preload() {
 
   for (let i = 0; i < tableCount; i++) {
     let pg = getImgArray(w, h);
-    tables.push({data: loadTable('data/exportD' + fileNameTags[i] + '_akima.csv', 'csv', 'header'), img: pg, counter: 40, enabled: true, name: "akima tr" + fileNameTags[i], trace: 40, bgVisibility: 0.01, toColor:colors[i], fromColor: toTransparent(colors[i])})
+    tables.push({data: loadTable('data/exportD' + fileNameTags[i] + '_akima.csv', 'csv', 'header'), img: pg, counter: 40, enabled: true, name: "akima D" + fileNameTags[i], trace: 40, bgVisibility: 0.01, toColor:colors[i], fromColor: toTransparent(colors[i])})
   }
 }
 
