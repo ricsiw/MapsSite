@@ -71,8 +71,8 @@ function initConsts(showAmount, tableCount, windowWidth = document.documentEleme
     if (!initDone) initVisualizationData();
     Consts.showAmount = showAmount;
     Consts.tableCount = tableCount;
-    Consts.windowWidth = windowWidth;
-    Consts.windowHeight = windowHeight;
+    Consts.windowWidth = Math.min(windowWidth, document.documentElement.scrollHeight - 20);
+    Consts.windowHeight = Math.min(windowHeight, document.documentElement.scrollHeight - 20);
 }
 
 function initMapData(fileNameFunc, fileNameTags) {
@@ -81,7 +81,7 @@ function initMapData(fileNameFunc, fileNameTags) {
     for (let i = 0; i < Consts.tableCount; i++) {
       let pg = getImgArray(Consts.windowWidth, Consts.windowHeight);
       let fileName = fileNameFunc(fileNameTags[i]);
-      Globals.tables.push({data: loadTable(fileName.path, 'fileType' in fileName ? fileName.fileType : 'csv', 'header'), img: pg, counter: 0, enabled: true, name: "tr" + fileNameTags[i], trace: 2000, traceStep: 40, bgVisibility: 0.01, toColor: Globals.colors[i], fromColor: toTransparent(Globals.colors[i])})
+      Globals.tables.push({data: loadTable(fileName.path, 'fileType' in fileName ? fileName.fileType : 'csv', 'header'), img: pg, counter: 0, enabled: true, name: "tr" + fileNameTags[i], trace: 250, traceStep: 5, bgVisibility: 0.01, toColor: Globals.colors[i], fromColor: toTransparent(Globals.colors[i])})
       Globals.tables[i].counter = Globals.tables[i].trace;
     }
 }

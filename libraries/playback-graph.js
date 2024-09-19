@@ -68,7 +68,7 @@ function drawGraph() {
       blendMode(ADD);
       if (Globals.keepBackground) {
         let c2 = lerpColor(table.fromColor, table.toColor, table.bgVisibility);
-        c2.setAlpha(2);
+        c2.setAlpha(1);
         fill(c2);
         for (let i = 0; i < table.counter; i++) {
           let latLng = latLngFromString(table.data.getString(i, 3), table.data.getString(i, 4));
