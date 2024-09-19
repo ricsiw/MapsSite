@@ -26,6 +26,11 @@ const options = {
   pitch: 0,
 };
 
+P5Capture.setDefaultOptions({
+  format: "png",
+  framerate: 25,
+});
+
 function toTransparent(c) {
   return color(c.levels[0], c.levels[1], c.levels[2], 0)
 }
@@ -45,8 +50,8 @@ function preload() {
   ];
 
   tables = new Array();
-  let w = document.documentElement.scrollWidth - 20;
-  let h =  document.documentElement.scrollHeight - 20;
+  let w = 800//document.documentElement.scrollWidth - 20;
+  let h =  800//document.documentElement.scrollHeight - 20;
 
   let fileNameTags = ['3', '4','6','7','8','9'];
 
@@ -86,7 +91,7 @@ function setup() {
     if (tick < minTick) minTick = tick;
   }
 
-  canvas = createCanvas(document.documentElement.scrollWidth - 20, document.documentElement.scrollHeight - 20);
+  canvas = createCanvas(800, 800);//(document.documentElement.scrollWidth - 20, document.documentElement.scrollHeight - 20);
   myMap = mappa.tileMap(options); 
   myMap.overlay(canvas)
 }
@@ -97,6 +102,25 @@ function setup() {
   let pageHeight = document.documentElement.scrollHeight - 20;
   resizeCanvas(pageWidth, pageHeight);
 }*/
+
+
+function getDistanceFromLatLng(lat1,lon1,lat2,lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1); 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c * 1000; // Distance in m
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
 
 function convert(x, y) {
   let lat = latOrigin + (y / radius) * radToDeg;
@@ -145,10 +169,30 @@ function draw() {
     text(paused ? "paused" : "playback speed: " + timeMultiplier + "x", 830, 20);
   }
 
+  drawScale();
+
   noStroke();
   for (let i = 0; i < tableCount; i++) {
     drawTable(tables[i]);
   }
+}
+
+function drawScale() {
+  let h = canvas.height - 56;
+  let l = canvas.width - 160;
+  let r = l + 120; 
+  let latlng1 = myMap.pixelToLatLng(l, h);
+  let latlng2 = myMap.pixelToLatLng(r, h); 
+  let dist = getDistanceFromLatLng(latlng1.lat, latlng1.lng, latlng2.lat, latlng2.lng);
+  strokeWeight(3);
+  stroke(color(255,255,255))
+  line(l, h, r, h)
+  line (l, h - 5, l, h + 5)
+  line (r, h - 5, r, h + 5)
+  fill(color(255,255,255))
+  noStroke();
+  textAlign(CENTER, CENTER);
+  text(Math.round(dist) + " m", l + (r-l) / 2, h + 16)
 }
 
 function drawTable(table) {
@@ -235,6 +279,14 @@ function keyPressed() {
   }
   else if (key == 'm') {
     keepBackground = !keepBackground;
+  }
+  else if (key == 'c') {
+    const capture = P5Capture.getInstance();
+    if (capture.state === "idle") {
+      capture.start();
+    } else {
+      capture.stop();
+    }
   }
   else if (keyCode == LEFT_ARROW) {
     print("hohoho")
