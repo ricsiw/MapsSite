@@ -1,8 +1,36 @@
-html, body {
+body, html {
+  height: 100%;
   margin: 0;
-  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto; /* Ensure the body is scrollable */
 }
 
-canvas {
+#controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; /* Ensure controls take full width */
+}
+
+#p5Canvas {
   display: block;
+  margin: auto;
+  border: 2px solid black; /* Example style */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example style */
+}
+
+/* Temporary styles for visualizing the Bootstrap grid */
+.container {
+  outline: 2px dashed red; /* Outline the container */
+}
+
+.row {
+  outline: 2px dashed blue; /* Outline the rows */
+}
+
+.col-1, .col-10 {
+  outline: 2px dashed green; /* Outline the columns */
+  background-color: rgba(0, 255, 0, 0.1); /* Light green background for columns */
 }

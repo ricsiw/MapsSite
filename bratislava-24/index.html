@@ -6,6 +6,9 @@
 
     <title>Sketch</title>
 
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="../libraries/p5.min.js"></script>
@@ -13,11 +16,34 @@
     <!-- <script src="../libraries/p5.capture.umd.min.js"></script> -->
   </head>
 
-  <body>
+  <body class="d-flex flex-column align-items-center justify-content-center vh-100">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-1"></div> <!-- Empty column for spacing -->
+        <div class="col-10" id="controls">
+          <button id="startButton" class="btn btn-primary">Start</button>
+          <button id="stopButton" class="btn btn-secondary">Stop</button>
+          <div class="form-group">
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" class="form-control-range" min="1" max="10" value="5">
+          </div>
+          <div class="form-group">
+            <label for="textInput">Text:</label>
+            <input type="text" id="textInput" class="form-control" value="Hello">
+          </div>
+        </div>
+        <div class="col-1"></div> <!-- Empty column for spacing -->
+      </div>
+    </div>
+
     <script src="../libraries/functions.js"></script>
     <script src="../libraries/playback-graph.js"></script>
     <script src="map.js"></script>
-  </body>
 
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
 </html>
- 
