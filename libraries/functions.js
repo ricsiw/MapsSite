@@ -71,7 +71,7 @@ function initConsts(showAmount, tableCount, windowWidth = document.documentEleme
     if (!initDone) initVisualizationData();
     Consts.showAmount = showAmount;
     Consts.tableCount = tableCount;
-    Consts.windowWidth = Math.min(windowWidth, document.documentElement.scrollHeight - 20);
+    Consts.windowWidth = Math.min(windowWidth, document.documentElement.scrollWidth - 20);
     Consts.windowHeight = Math.min(windowHeight, document.documentElement.scrollHeight - 20);
 }
 
