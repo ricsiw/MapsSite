@@ -81,7 +81,7 @@ function initMapData(fileNameFunc, fileNameTags) {
     for (let i = 0; i < Consts.tableCount; i++) {
       let pg = getImgArray(Consts.windowWidth, Consts.windowHeight);
       let fileName = fileNameFunc(fileNameTags[i]);
-      Globals.tables.push({data: loadTable(fileName.path, 'fileType' in fileName ? fileName.fileType : 'csv', 'header'), img: pg, counter: 0, enabled: true, name: "tr" + fileNameTags[i], trace: 250, traceStep: 5, bgVisibility: 0.01, toColor: Globals.colors[i], fromColor: toTransparent(Globals.colors[i])})
+      Globals.tables.push({data: loadTable(fileName.path, 'fileType' in fileName ? fileName.fileType : 'csv', 'header'), img: pg, counter: 0, enabled: true, name: "tr" + fileNameTags[i], trace: 30, traceStep: 2, bgVisibility: 0.005, toColor: Globals.colors[i], fromColor: toTransparent(Globals.colors[i])})
       Globals.tables[i].counter = Globals.tables[i].trace;
     }
 }
@@ -102,7 +102,7 @@ function setupVisualization(mode = P2D) {
     Consts.graphicsMode = mode;
     Globals.canvas = createCanvas(Consts.windowWidth, Consts.windowHeight, mode);
     Globals.map = Consts.mappa.tileMap(Consts.options); 
-    Globals.map.overlay(canvas)
+    Globals.map.overlay(Globals.canvas)
 }
 
 //---------------------------------------------------------- HELPERS ----------------------------------------------------------
