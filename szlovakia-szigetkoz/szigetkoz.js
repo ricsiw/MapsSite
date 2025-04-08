@@ -28,7 +28,7 @@ const options = {
 
 P5Capture.setDefaultOptions({
   format: "png",
-  framerate: 25,
+  framerate: 24,
 });
 
 function toTransparent(c) {

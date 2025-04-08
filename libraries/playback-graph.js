@@ -79,14 +79,17 @@ function drawGraph() {
         }
       }
       blendMode(BLEND);
-  
+
+      let realValue = table.data.columns.length >= 6 && (table.data.getString(table.counter, 5) === 'True');
+      let fromColor = realValue ? table.fromColor : color(255, 0, 0, 63);
+      let toColor = realValue ? table.toColor : toTransparent(fromColor);
       for (let i = table.counter - table.trace; i <= table.counter; i += Math.min(Math.max(table.counter - i, 1), table.traceStep)) {
         let latLng = latLngFromString(table.data.getString(i, 3), table.data.getString(i, 4));
         let p = Globals.map.latLngToPixel(latLng[0], latLng[1]);
   
-        let c = lerpColor(table.fromColor, table.toColor, Math.pow((i - (table.counter - table.trace)) / table.trace, 3.0));
+        let c = lerpColor(fromColor, toColor, Math.pow((i - (table.counter - table.trace)) / table.trace, 3.0));
   
-        if (i == table.counter) {
+        if (i == table.counter && realValue) {
           fill(color(0, 0, 0))
           ellipse(p.x, p.y, 10, 10);
           fill(c);

@@ -4,13 +4,13 @@ P5Capture.setDefaultOptions({
 });
 
 function getFileName(param) {
-  return { path: 'data/export_tr' + param + '_akima.csv', fileType: 'ssv' };
+  return { path: 'data/pygmy-owl-pos-data_akima-eet.csv', fileType: 'ssv' };
 }
 
 function preload() {
-  initOrigin(47.77156184, 17.86227096);
-  initConsts(20, 3, 1100, 1100);
-  const fileNameTags = ['0', '1', '3'];
+  initOrigin(63.066680, 23.551392, 14);
+  initConsts(10, 1, 1100, 1100);
+  const fileNameTags = ['0'];
   initMapData(getFileName, fileNameTags);
 }
 

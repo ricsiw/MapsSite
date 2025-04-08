@@ -59,12 +59,13 @@ function initVisualizationData() {
     if (Consts.windowHeight == null)Consts.windowHeight = document.documentElement.scrollHeight - 20;
 }
 
-function initOrigin(lat, lng) {
+function initOrigin(lat, lng, zoom = 17) {
     if (!initDone) initVisualizationData();
     Consts.latOrigin = lat;
     Consts.lngOrigin = lng;
     Consts.options.lat = lat;
     Consts.options.lng = lng;
+    Consts.options.zoom = zoom;
 }
 
 function initConsts(showAmount, tableCount, windowWidth = document.documentElement.scrollWidth - 20, windowHeight = document.documentElement.scrollHeight - 20) {
