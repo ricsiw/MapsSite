@@ -43,16 +43,26 @@ function initVisualizationData() {
     if (initDone) return;
     initDone = true;
     Globals.colors = [
-        color(70, 240, 240),
-        color(245, 156, 22),
-        color(230, 25, 75),
-        color(43, 217, 37),
-        color(199, 199, 4),
-        color(123, 16, 230),
-        color(33, 81, 255),
-        color(245, 130, 48),
-        color(0, 0, 0),
-        color(240, 50, 230),
+        color(70, 240, 240),    // cyan
+        color(245, 156, 22),    // orange
+        color(230, 25, 75),     // red
+        color(0, 180, 40),      // green (darker, more distinct)
+        color(199, 199, 4),     // yellow
+        color(123, 16, 230),    // purple
+        color(33, 81, 255),     // blue
+        color(245, 130, 48),    // orange-red
+        color(0, 0, 0),         // black
+        color(240, 50, 230),    // magenta
+        color(128, 0, 128),     // deep purple
+        color(0, 128, 128),     // teal
+        color(255, 215, 0),     // gold
+        color(0, 255, 200),     // turquoise (replaces spring green for more contrast)
+        color(255, 69, 0),      // orange-red
+        color(0, 191, 255),     // deep sky blue
+        color(255, 20, 147),    // deep pink
+        color(139, 69, 19),     // saddle brown
+        color(128, 128, 128),   // gray
+        color(255, 255, 255)    // white
     ];
 
     if (Consts.windowWidth == null)Consts.windowWidth = document.documentElement.scrollWidth - 20;
