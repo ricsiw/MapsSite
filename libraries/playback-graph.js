@@ -70,12 +70,15 @@ function drawGraph() {
         return; // Skip drawing this table until its start time
       }
 
+      let hasEnoughColumns = table.data.columns.length >= 6;
+
       //blendMode(ADD);
       if (Globals.keepBackground) {
         let c2 = lerpColor(table.fromColor, table.toColor, table.bgVisibility);
         c2.setAlpha(1);
         fill(c2);
         for (let i = 0; i < table.counter; i++) {
+          if (hasEnoughColumns && table.data.getString(i, 5) !== 'True') continue;
           let latLng = latLngFromString(table.data.getString(i, 3), table.data.getString(i, 4));
           let p = Globals.map.latLngToPixel(latLng[0], latLng[1]);
           ellipse(p.x, p.y, 5, 5);

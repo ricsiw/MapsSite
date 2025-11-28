@@ -44,7 +44,7 @@ function initVisualizationData() {
     initDone = true;
     Globals.colors = [
         color(70, 240, 240),    // cyan
-        color(245, 156, 22),    // orange
+        color(255, 20, 147),    // deep pink
         color(230, 25, 75),     // red
         color(0, 180, 40),      // green (darker, more distinct)
         color(199, 199, 4),     // yellow
@@ -59,7 +59,7 @@ function initVisualizationData() {
         color(0, 255, 200),     // turquoise (replaces spring green for more contrast)
         color(255, 69, 0),      // orange-red
         color(0, 191, 255),     // deep sky blue
-        color(255, 20, 147),    // deep pink
+        color(245, 156, 22),    // orange
         color(139, 69, 19),     // saddle brown
         color(128, 128, 128),   // gray
         color(255, 255, 255)    // white
